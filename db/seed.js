@@ -1,5 +1,5 @@
 //grab our client with destructuring fromt he exprt in index.js
-const { client } = require("./index.js");
+const { client, getAllUsers } = require("./index.js");
 
 async function testDB() {
   try {
@@ -7,8 +7,8 @@ async function testDB() {
     client.connect();
 
     //queries are promises, wo we await them
-    const { rows } = await client.query(`SELECT * FROM users;`);
-    console.log(rows);
+    const users = await client.query(`SELECT * FROM users;`);
+    console.log(users);
   } catch (error) {
     console.error(error);
   } finally {
