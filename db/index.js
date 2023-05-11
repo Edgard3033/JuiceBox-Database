@@ -13,8 +13,25 @@ async function getAllUsers() {
   return rows;
 }
 
+//helper funtion to create the users
+async function createUser({ username, password }) {
+  try {
+    const result = await client.query(
+      `
+        INSERT INTO users(username, password)
+        VALUES ($1, $2);
+        `,
+      [username, password]
+    );
+    return result;
+  } catch (error) {
+    throw error;
+  }
+}
+
 //exporting
 module.exports = {
   client,
   getAllUsers,
+  createUser,
 };
