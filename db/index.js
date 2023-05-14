@@ -14,7 +14,7 @@ async function getAllUsers() {
 }
 
 //helper funtion to create the users
-async function createUser({ username, password }) {
+async function createUser({ username, password, name, location }) {
   try {
     const { rows } = await client.query(
       `
@@ -23,7 +23,7 @@ async function createUser({ username, password }) {
         ON CONFLICT (username) DO NOTHING
         RETURNING *;
         `,
-      [username, password]
+      [username, password, name, location]
     );
     return rows;
   } catch (error) {
