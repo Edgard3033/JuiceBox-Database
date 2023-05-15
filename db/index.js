@@ -20,8 +20,8 @@ async function createUser({ username, password, name, location }) {
       rows: [user],
     } = await client.query(
       `
-        INSERT INTO users(username, password)
-        VALUES ($1, $2)
+        INSERT INTO users(username, password, name, location)
+        VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO NOTHING
         RETURNING *;
         `,
@@ -49,13 +49,14 @@ async function updateUser(id, fields = {}) {
       rows: [user],
     } = await client.query(
       `
-      UPDATE users
-      SET ${setString}
-      WHERE id=$${setString.length + 1}
-      RETURNING *;
-      `,
+    UPDATE users
+    SET ${setString}
+    WHERE id=$${Object.keys(fields).length + 1}
+    RETURNING *;
+    `,
       [...Object.values(fields), id]
     );
+
     return user;
   } catch (error) {
     throw error;

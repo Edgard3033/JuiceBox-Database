@@ -44,7 +44,7 @@ async function testDB() {
     console.log("Starting to test database...");
     //connect the client to the database
 
-    //queries are promises, wo we await them
+    //queries are promises, so we await them
     const users = await getAllUsers();
     console.log("getAllUsers:", users);
 
@@ -90,7 +90,7 @@ async function createTables() {
             password varchar(255) NOT NULL,
             name VARCHAR(255) NOT NULL,
             location VARCHAR(255) NOT NULL,
-            active BOOLEAN DEFAULT true;
+            active BOOLEAN DEFAULT true
         );
         `);
     console.log("Finished building tables!");
