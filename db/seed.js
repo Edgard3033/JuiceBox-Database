@@ -1,5 +1,5 @@
 //grab our client with destructuring fromt he exprt in index.js
-const { client, getAllUsers, createUser } = require("./index.js");
+const { client, getAllUsers, createUser, updateUser } = require("./index.js");
 
 //This function should attempt to create a few users
 async function createInitialUsers() {
@@ -48,6 +48,13 @@ async function testDB() {
     const users = await getAllUsers();
     console.log("getAllUsers:", users);
 
+    console.log("Calling updateUser on users[0]");
+    const updateUserResult = await updateUser(users[0].id, {
+      name: "Newname sogood",
+      location: "Lesterville, KY",
+    });
+
+    console.log("Result:", updateUserResult);
     console.log("Finished database test!");
   } catch (error) {
     console.error("Error testing database!");
