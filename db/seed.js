@@ -1,5 +1,14 @@
 //grab our client with destructuring fromt he exprt in index.js
-const { client, getAllUsers, createUser, updateUser } = require("./index.js");
+const {
+  client,
+  getAllUsers,
+  createUser,
+  updateUser,
+  getAllPost,
+  createPost,
+  updatePost,
+  getPostByUser,
+} = require("./index.js");
 
 //This function should attempt to create a few users
 async function createInitialUsers() {
@@ -45,6 +54,7 @@ async function testDB() {
     //connect the client to the database
 
     //queries are promises, so we await them
+    console.log("Calling getAllUsers");
     const users = await getAllUsers();
     console.log("getAllUsers:", users);
 
@@ -53,8 +63,23 @@ async function testDB() {
       name: "Newname sogood",
       location: "Lesterville, KY",
     });
-
     console.log("Result:", updateUserResult);
+
+    console.log("Calling getAllPost");
+    const post = await getAllPost();
+    console.log("Result:", post);
+
+    console.log("Calling updatePost on posts[0]");
+    const updatePostResult = await updatePost(posts[0].id, {
+      title: "New Title",
+      content: "Updated Content",
+    });
+    console.log("Result:", updatePostResult);
+
+    console.log("Calling getUserById with 1");
+    const albert = await getUserById(1);
+    console.log("Result:", albert);
+
     console.log("Finished database test!");
   } catch (error) {
     console.error("Error testing database!");
@@ -68,7 +93,8 @@ async function dropTables() {
     console.log("Starting to drop tables...");
 
     await client.query(`
-        DROP TABLE IF EXISTS users;
+    DROP TABLE IF EXISTS posts;
+    DROP TABLE IF EXISTS users;
         `);
 
     console.log("Finished dropping tables!");
@@ -93,10 +119,38 @@ async function createTables() {
             active BOOLEAN DEFAULT true
         );
         `);
+    console.log("users table created");
+
+    await client.query(`
+        CREATE TABLE posts(
+          id SERIAL PRIMARY KEY,
+          "authorId" INTEGER REFERENCES users(id),
+          title VARCHAR(255) NOT NULL,
+          content TEXT NOT NULL,
+          active BOOLEAN DEFAULT true
+        );
+        `);
+    console.log("post table created");
     console.log("Finished building tables!");
   } catch (error) {
     console.error("Error building tables!");
     throw error; // we pass the error up to the funtion that calls createTables()
+  }
+}
+
+//This creates the initial post
+async function createInitialPosts() {
+  try {
+    const [albert, sandra, glamgal] = await getAllUsers();
+
+    await createPost({
+      authorId: albert.id,
+      title: "First Post",
+      content:
+        "This is my first post. I hope I love writing blogs as much as I love writing them.",
+    });
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -107,6 +161,7 @@ async function rebuildDB() {
     await dropTables();
     await createTables();
     await createInitialUsers();
+    await createInitialPosts();
   } catch (error) {
     console.error(error);
   }
