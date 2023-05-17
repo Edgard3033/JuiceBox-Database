@@ -138,21 +138,19 @@ async function getPostByUser(userId) {
 //function to get a user and their post
 async function getUserById(userId) {
   try {
-    const { rows } = await client.query(
-      `
-    SELECT * FROM users
-    WHERE id=$1;
-    `,
-      [id]
-    );
-    if (!{ rows }) {
+    const {
+      rows: [user],
+    } = await client.query(`
+  SELECT id, username, name, location, active
+  FROM users 
+  WHERE id=${userId}
+  `);
+    if (!user) {
       return null;
-    } else {
-      delete rows[0].password;
-      rows.post = await getPostByUser(id);
-      console.log("Rows in getUserById: ", rows);
-      return rows;
     }
+
+    user.posts = await getPostByUser(userId);
+    return user;
   } catch (error) {
     throw error;
   }
@@ -168,4 +166,5 @@ module.exports = {
   createPost,
   updatePost,
   getPostByUser,
+  getUserById,
 };
