@@ -137,27 +137,24 @@ async function getPostByUser(userId) {
 
 //function to get a user and their post
 async function getUserById(userId) {
-  // first get the user with the provided userId
-  const { rows } = client.query(
-    `
-  SELECT * FROM users
-  WHERE id = $1;
-  `,
-    [userId]
-  );
-
-  // if no user is found, return null
-  if (!rows || !rows.length) {
-    return null;
-  } else {
-    await client.query(`
-    DELETE password
-    `);
-    // get their posts (use getPostsByUser)
-    const posts = await getPostsByUser(userId);
-    // add the posts to the user object with key 'posts'
-    // return the modified user object
-    return user;
+  try {
+    const { rows } = await client.query(
+      `
+    SELECT * FROM users
+    WHERE id=$1;
+    `,
+      [id]
+    );
+    if (!{ rows }) {
+      return null;
+    } else {
+      delete rows[0].password;
+      rows.post = await getPostByUser(id);
+      console.log("Rows in getUserById: ", rows);
+      return rows;
+    }
+  } catch (error) {
+    throw error;
   }
 }
 
