@@ -19,9 +19,9 @@ usersRouter.get("/", async (req, res) => {
 
 usersRouter.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
-  const jwt = require("jsonwebtoken");
-  const { JWT_SECRET } = process.env.JWT_SECRET;
+  console.log("LOGIN =>", username, password);
 
+  // request must have both
   if (!username || !password) {
     next({
       name: "MissingCredentialsError",
@@ -33,8 +33,10 @@ usersRouter.post("/login", async (req, res, next) => {
     const user = await getUserByUsername(username);
 
     if (user && user.password == password) {
-      const token = jwt.sign({ username }, JWT_SECRET);
+      // create token & return to user
+      const token = jwt.sign({ user }, process.env.JWT_SECRET);
       res.send({ message: "you're logged in!", token });
+      console.log(token);
     } else {
       next({
         name: "IncorrectCredentialsError",
@@ -45,8 +47,6 @@ usersRouter.post("/login", async (req, res, next) => {
     console.log(error);
     next(error);
   }
-
-  res.send({ username, password });
 });
 
 usersRouter.post("/register", async (req, res, next) => {
